@@ -1,7 +1,9 @@
 package via.pro3.slaughterhouse.busniess;
 
+import org.springframework.stereotype.Service;
 import via.pro3.slaughterhouse.model.Animal;
 import via.pro3.slaughterhouse.busniess.persistence.PersistenceException;
+import via.pro3.slaughterhouse.model.AnimalType;
 
 import java.util.List;
 

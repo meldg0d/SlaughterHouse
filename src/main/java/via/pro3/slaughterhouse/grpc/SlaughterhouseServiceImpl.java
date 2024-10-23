@@ -34,20 +34,15 @@ public class SlaughterhouseServiceImpl extends SlaughterhouseServiceGrpc.Slaught
         try {
             // Get data from the gRPC request
             int id = request.getId();
-            via.pro3.proto.AnimalType protoType = request.getType();  // gRPC AnimalType
+            AnimalType protoType = request.getType();  // gRPC AnimalType
             double weight = request.getWeight();
 
-            // Convert gRPC AnimalType to model AnimalType
-            via.pro3.slaughterhouse.model.AnimalType modelType = GrpcToModel.toModel(protoType);
-
             // Add the animal using the model's AnimalType
-            via.pro3.slaughterhouse.model.Animal modelAnimal = slaugter.addAnimal(id, modelType, weight);
+            via.pro3.slaughterhouse.model.Animal modelAnimal = slaugter.addAnimal(id, protoType, weight);
 
-            // Convert the model Animal back to gRPC Animal for the response
-            via.pro3.proto.Animal responseAnimal = ModelToGrpc.toProto(modelAnimal);
 
             // Send the gRPC response
-            responseObserver.onNext(responseAnimal);
+            responseObserver.onNext(modelAnimal);
             responseObserver.onCompleted();
         } catch (PersistenceException e) {
             Status error = Status.newBuilder().setCode(Code.INTERNAL_VALUE).setMessage("Could not save data").build();

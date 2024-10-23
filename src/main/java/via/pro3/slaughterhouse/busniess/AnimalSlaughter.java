@@ -1,11 +1,15 @@
 package via.pro3.slaughterhouse.busniess;
 
+import org.springframework.stereotype.Service;
 import via.pro3.slaughterhouse.model.Animal;
 import via.pro3.slaughterhouse.busniess.persistence.Persistence;
 import via.pro3.slaughterhouse.busniess.persistence.PersistenceException;
+import via.pro3.slaughterhouse.model.AnimalType;
 import via.pro3.slaughterhouse.model.ValdidationExecption;
 
 import java.util.*;
+
+@Service
 
 public class AnimalSlaughter implements AnimalSlaugtherSystem {
 

@@ -35,7 +35,7 @@ public class AnimalDAO implements Persistence {
     @Override
     public Collection<Animal> readAll() throws PersistenceException {
         try {
-            return helper.map(this::create, "SELECT * FROM animal");
+            return helper.map(this::create, "SELECT * FROM \"animal\"");
         } catch (SQLException e) {
             throw new PersistenceException(e);
         }
