@@ -1,0 +1,51 @@
+syntax = "proto3";
+// package here if needed
+option java_multiple_files = true;
+option java_package = "via.pro3.proto";
+
+import "google/protobuf/empty.proto";
+
+enum AnimalType {
+  COW = 0;
+  PIG = 1;
+  CHICKEN = 2;
+}
+
+enum PartType {
+  HEAD = 0;
+  BODY = 1;
+  LEG = 2;
+  WING = 3;
+  TAIL = 4;
+  INTERNAL_ORGAN = 5;
+  BLOOD = 6;
+  SKIN = 7;
+  FEATHER = 8;
+  BONE = 9;
+  MEAT = 10;
+  FAT = 11;
+  OTHER = 12;
+}
+
+
+
+message Animal {
+  int32 id = 1;
+  AnimalType type = 2;
+  double weight = 3;
+}
+
+message Animals {
+repeated Animal animals = 1;
+}
+
+message AnimalRequest {
+  int32 id = 1;
+}
+
+service SlaughterhouseService {
+  rpc addAnimal(Animal) returns (Animal);
+  rpc GetAnimal(AnimalRequest) returns (Animal);
+  rpc getAllAnimals(google.protobuf.Empty) returns (Animals);
+  // Additional methods here later
+}
