@@ -9,12 +9,11 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import via.pro3.proto.Animals;
-import via.pro3.slaughterhouse.model.Animal;
-import via.pro3.proto.SlaughterhouseServiceGrpc;
+
+import via.pro3.proto.*;
 import via.pro3.slaughterhouse.busniess.AnimalSlaugtherSystem;
+import via.pro3.slaughterhouse.busniess.persistence.NotFoundException;
 import via.pro3.slaughterhouse.busniess.persistence.PersistenceException;
-import via.pro3.slaughterhouse.model.AnimalType;
 import via.pro3.slaughterhouse.model.ValdidationExecption;
 
 import java.util.List;
@@ -29,6 +28,7 @@ public class SlaughterhouseServiceImpl extends SlaughterhouseServiceGrpc.Slaught
         this.slaugter = slaugter;
     }
 
+
     @Override
     public void addAnimal(Animal request, StreamObserver<Animal> responseObserver) {
         try {
@@ -37,12 +37,17 @@ public class SlaughterhouseServiceImpl extends SlaughterhouseServiceGrpc.Slaught
             AnimalType protoType = request.getType();  // gRPC AnimalType
             double weight = request.getWeight();
 
-            // Add the animal using the model's AnimalType
-            via.pro3.slaughterhouse.model.Animal modelAnimal = slaugter.addAnimal(id, protoType, weight);
+            // Convert gRPC AnimalType to model AnimalType
+            via.pro3.slaughterhouse.model.AnimalType modelType = via.pro3.slaughterhouse.model.AnimalType.valueOf(protoType.name());
 
+            // Add the animal using the model's AnimalType
+            via.pro3.slaughterhouse.model.Animal modelAnimal = slaugter.addAnimal(id, modelType, weight);
+
+            // Convert modelAnimal to protoAnimal
+            via.pro3.proto.Animal protoAnimal = ModelToGrpc.toProto(modelAnimal);
 
             // Send the gRPC response
-            responseObserver.onNext(modelAnimal);
+            responseObserver.onNext(protoAnimal);
             responseObserver.onCompleted();
         } catch (PersistenceException e) {
             Status error = Status.newBuilder().setCode(Code.INTERNAL_VALUE).setMessage("Could not save data").build();
@@ -78,4 +83,26 @@ public class SlaughterhouseServiceImpl extends SlaughterhouseServiceGrpc.Slaught
             logger.error("Could not retrieve animals", e);
         }
     }
+
+    @Override
+    public void getAnimal(AnimalRequest request, StreamObserver<Animal> responseObserver) {
+        try{
+            int id = request.getId();
+            via.pro3.slaughterhouse.model.Animal animal = slaugter.getAnimal(id);
+            responseObserver.onNext(ModelToGrpc.toProto(animal));
+            responseObserver.onCompleted();
+
+        } catch (NotFoundException e) {
+            Status error = Status.newBuilder().setCode(Code.NOT_FOUND_VALUE).setMessage("Car not found").build();
+            responseObserver.onError(StatusProto.toStatusRuntimeException(error));
+        } catch (PersistenceException e) {
+            Status error = Status.newBuilder().setCode(Code.INTERNAL_VALUE).setMessage("Could not read data").build();
+            responseObserver.onError(StatusProto.toStatusRuntimeException(error));
+        } catch (ValdidationExecption e) {
+            Status error = Status.newBuilder().setCode(Code.INVALID_ARGUMENT_VALUE).setMessage(e.getMessage()).build();
+            responseObserver.onError(StatusProto.toStatusRuntimeException(error));
+        }
+    }
+
+
 }

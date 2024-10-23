@@ -2,6 +2,7 @@ package via.pro3.slaughterhouse.data;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import via.pro3.slaughterhouse.busniess.persistence.NotFoundException;
 import via.pro3.slaughterhouse.model.Animal;
 import via.pro3.slaughterhouse.busniess.persistence.Persistence;
 import via.pro3.slaughterhouse.busniess.persistence.PersistenceException;
@@ -24,13 +25,14 @@ public class AnimalDAO implements Persistence {
 
     @Override
     public Animal create(int id, AnimalType type, double weight) throws PersistenceException {
-        try{
-            helper.executeUpdate("INSERT INTO animal VALUES (?, ?, ?)", id, type, weight);
+        try {
+            helper.executeUpdate("INSERT INTO animal (id, type, weight) VALUES (?, ?, ?)", id, type.name(), weight);
             return new Animal(id, type, weight);
-        } catch (Exception e) {
-            throw new PersistenceException((SQLException) e);
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
         }
     }
+
 
     @Override
     public Collection<Animal> readAll() throws PersistenceException {
@@ -61,6 +63,12 @@ public class AnimalDAO implements Persistence {
 
     @Override
     public Animal read(int id) throws PersistenceException {
-        return null;
+        try {
+            Animal animal = helper.mapSingle(this::create, "SELECT * FROM \"animal\" WHERE id = ?", id);
+            if(animal == null) throw new NotFoundException();
+            return animal;
+        }catch (SQLException e){
+            throw new PersistenceException(e);
+        }
     }
 }

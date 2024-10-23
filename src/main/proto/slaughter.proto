@@ -45,7 +45,7 @@ message AnimalRequest {
 
 service SlaughterhouseService {
   rpc addAnimal(Animal) returns (Animal);
-  rpc GetAnimal(AnimalRequest) returns (Animal);
+  rpc getAnimal(AnimalRequest) returns (Animal);
   rpc getAllAnimals(google.protobuf.Empty) returns (Animals);
   // Additional methods here later
 }

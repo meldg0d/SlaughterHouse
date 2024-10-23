@@ -25,9 +25,9 @@ public class AnimalSlaughter implements AnimalSlaugtherSystem {
         if(type == null) throw new ValdidationExecption("type is required");
         if(weight <= 0) throw new ValdidationExecption("weight must be positive");
 
-
-
-return null;
+        Animal animal = persistence.create(id, type, weight);
+        animalCache.put(id, animal);
+        return animal;
     }
     @Override
     public void removeAnimal(Animal animal) throws PersistenceException, ValdidationExecption {
@@ -45,7 +45,11 @@ return null;
 
     @Override
     public Animal getAnimal(int id) throws PersistenceException, ValdidationExecption {
-        return null;
+        if(id <= 0) throw new ValdidationExecption("id must be positive");
+        if (!animalCache.containsKey(id)) {
+            animalCache.put(id, persistence.read(id));
+        }
+        return animalCache.get(id);
     }
 
     @Override
