@@ -10,7 +10,6 @@ import via.pro3.slaughterhouse.model.ValdidationExecption;
 import java.util.*;
 
 @Service
-
 public class AnimalSlaughter implements AnimalSlaugtherSystem {
 
     private final Map<Integer, Animal> animalCache = new HashMap<>();
